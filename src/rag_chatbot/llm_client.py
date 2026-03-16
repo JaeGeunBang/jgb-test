@@ -1,5 +1,3 @@
-import json
-
 from .exceptions import LLMError
 from .models import Config, SearchResult
 
@@ -13,11 +11,9 @@ SYSTEM_PROMPT = (
 class LLMClient:
     def __init__(self, config: Config) -> None:
         self._config = config
-        if config.llm_provider == "bedrock":
-            import boto3
-            self._bedrock = boto3.client(
-                "bedrock-runtime", region_name=config.aws_region
-            )
+        if config.llm_provider == "anthropic":
+            from anthropic import Anthropic
+            self._anthropic = Anthropic(api_key=config.anthropic_api_key)
         else:
             from openai import OpenAI
             self._openai = OpenAI(api_key=config.openai_api_key)
@@ -28,8 +24,8 @@ class LLMClient:
         )
         user_message = f"Context:\n{context_text}\n\nQuestion: {question}"
 
-        if self._config.llm_provider == "bedrock":
-            return self._generate_bedrock(user_message)
+        if self._config.llm_provider == "anthropic":
+            return self._generate_anthropic(user_message)
         return self._generate_openai(user_message)
 
     def _generate_openai(self, user_message: str) -> str:
@@ -46,21 +42,15 @@ class LLMClient:
         except OpenAIError as e:
             raise LLMError(f"LLM API 호출에 실패했습니다: {e}") from e
 
-    def _generate_bedrock(self, user_message: str) -> str:
+    def _generate_anthropic(self, user_message: str) -> str:
+        from anthropic import AnthropicError
         try:
-            body = json.dumps({
-                "anthropic_version": "bedrock-2023-05-31",
-                "max_tokens": 1024,
-                "system": SYSTEM_PROMPT,
-                "messages": [{"role": "user", "content": user_message}],
-            })
-            response = self._bedrock.invoke_model(
-                modelId=self._config.bedrock_llm_model,
-                body=body,
-                contentType="application/json",
-                accept="application/json",
+            response = self._anthropic.messages.create(
+                model=self._config.anthropic_model,
+                max_tokens=1024,
+                system=SYSTEM_PROMPT,
+                messages=[{"role": "user", "content": user_message}],
             )
-            result = json.loads(response["body"].read())
-            return result["content"][0]["text"]
-        except Exception as e:
-            raise LLMError(f"Bedrock API 호출에 실패했습니다: {e}") from e
+            return response.content[0].text
+        except AnthropicError as e:
+            raise LLMError(f"Anthropic API 호출에 실패했습니다: {e}") from e

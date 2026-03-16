@@ -4,4 +4,4 @@ pypdf
 python-dotenv
 pytest
 hypothesis
-boto3
+anthropic
