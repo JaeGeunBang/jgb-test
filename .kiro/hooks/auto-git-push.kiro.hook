@@ -7,7 +7,7 @@
     "type": "userTriggered"
   },
   "then": {
-    "type": "runCommand",
-    "command": "git push"
+    "type": "askAgent",
+    "prompt": "먼저 git push를 실행해주세요. 그 다음, 최근 작업 내용을 검토하고 프로젝트에 큰 변경사항(새로운 기능, 구조 변경, 중요한 수정 등)이 있다면 README.md를 업데이트해주세요. 사소한 버그 수정이나 코드 정리 수준이면 업데이트하지 않아도 됩니다."
   }
 }
