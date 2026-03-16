@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from .exceptions import ConfigError
 from .models import Config
 
-
+# print()
 def load_config(env_file: str = ".env") -> Config:
     """
     .env 파일 및 환경 변수에서 설정을 로드합니다.
