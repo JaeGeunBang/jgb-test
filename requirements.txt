@@ -1,0 +1,7 @@
+openai
+chromadb
+pypdf
+python-dotenv
+pytest
+hypothesis
+boto3

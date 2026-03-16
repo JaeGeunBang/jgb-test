@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "Auto Git Push",
+  "description": "커밋 후 자동으로 git push를 실행합니다",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "runCommand",
+    "command": "git push"
+  }
+}
